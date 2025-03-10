@@ -16,6 +16,7 @@ class AdminLoginPage(BasePage):
     def login(self, username, password):
         self.send_keys(self.USERNAME, username)
         self.send_keys(self.PASSWORD, password)
+        self.find(self.LOGIN_BUTTON)
         self.click(self.LOGIN_BUTTON)
 
     def is_logged_in(self):
@@ -25,4 +26,4 @@ class AdminLoginPage(BasePage):
         self.click(self.LOGOUT_BUTTON)
 
     def is_logged_out(self):
-        return not self.find(self.MENU)
+        return self.find(self.LOGIN_BUTTON)
