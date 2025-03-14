@@ -5,6 +5,7 @@ import os
 from utils.data_generator import DataGenerator
 from pages.catalog_page import CatalogPage
 from pages.product_cart_page import ProductCartPage
+from pages.admin_login_page import AdminLoginPage
 
 
 def pytest_addoption(parser):
@@ -65,3 +66,9 @@ def macbook_page(browser, base_url):
     macbook_page = ProductCartPage(browser)
     macbook_page.macbook_page_open(base_url)
     return macbook_page
+
+@pytest.fixture
+def admin_login_page(browser, base_url):
+    admin_login_page = AdminLoginPage(browser)
+    admin_login_page.admin_page_open(base_url)
+    return admin_login_page
