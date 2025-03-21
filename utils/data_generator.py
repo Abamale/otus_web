@@ -11,3 +11,11 @@ class DataGenerator:
             "email": self.faker.unique.email(),
             "password": self.faker.password(length=10),
         }
+
+    def generate_products_data(self):
+        return {
+            "product_name": self.faker.word(),
+            "meta_tag_title": self.faker.word(),
+            "model": self.faker.word(),
+            "keyword": self.faker.slug()
+        }

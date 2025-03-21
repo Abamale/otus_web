@@ -15,6 +15,7 @@ class RegisterPage(BasePage):
     CONTINUE_BUTTON = (By.CSS_SELECTOR, "button.btn.btn-primary")
     CONTENT_FIELD = (By.CSS_SELECTOR, "#content")
 
+
     def register_page_open(self, base_url):
         self.driver.get(base_url + self.URL)
 

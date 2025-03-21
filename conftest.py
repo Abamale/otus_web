@@ -2,6 +2,8 @@ import pytest
 from selenium import webdriver
 from dotenv import load_dotenv
 import os
+
+from pages.admin_products_page import AdminProductsPage
 from utils.data_generator import DataGenerator
 from pages.catalog_page import CatalogPage
 from pages.product_cart_page import ProductCartPage
@@ -72,3 +74,21 @@ def admin_login_page(browser, base_url):
     admin_login_page = AdminLoginPage(browser)
     admin_login_page.admin_page_open(base_url)
     return admin_login_page
+
+@pytest.fixture
+def admin_browser(browser, base_url, admin_credentials):
+    admin_login_page = AdminLoginPage(browser)
+    admin_login_page.admin_page_open(base_url)
+    admin_login_page.login(admin_credentials["username"], admin_credentials["password"])
+    return browser
+
+@pytest.fixture
+def product_page(admin_browser):
+    products_page = AdminProductsPage(admin_browser)
+    products_page.admin_products_page_open()
+    return products_page
+
+@pytest.fixture
+def fake_product():
+    generator = DataGenerator()
+    return generator.generate_products_data()
