@@ -15,4 +15,4 @@ def test_is_new_product_added(product_page, fake_product):
 def test_is_product_deleted(product_page, fake_product):
     product_page.add_new_product(fake_product)
     product_page.delete_product(fake_product)
-    assert not product_page.is_new_product_added(fake_product), "Товар не был удален"
+    assert product_page.is_product_deleted(fake_product), "Товар не был удален"

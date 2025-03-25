@@ -1,3 +1,5 @@
+import random
+
 from faker import Faker
 
 class DataGenerator:
@@ -14,7 +16,7 @@ class DataGenerator:
 
     def generate_products_data(self):
         return {
-            "product_name": self.faker.word(),
+            "product_name": f"{self.faker.word()}_{random.randint(9, 9999999)}",
             "meta_tag_title": self.faker.word(),
             "model": self.faker.word(),
             "keyword": self.faker.slug()

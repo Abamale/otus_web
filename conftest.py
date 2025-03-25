@@ -2,6 +2,7 @@ import pytest
 from selenium import webdriver
 from dotenv import load_dotenv
 import os
+import logging
 
 from pages.admin_products_page import AdminProductsPage
 from utils.data_generator import DataGenerator
@@ -15,6 +16,32 @@ def pytest_addoption(parser):
     local_ip = os.getenv("LOCAL_IP")
     parser.addoption("--browser", action="store", default="chrome", help="Browser to use: chrome, firefox, edge")
     parser.addoption("--base-url", action="store", default=f"http://{local_ip}:8081", help="Base URL for OpenCart")
+
+# @pytest.fixture(scope="session", autouse=True)
+# def setup_logging():
+#     """Настройка логирования для тестов"""
+#     logger = logging.getLogger("TestLogger")
+#     if not logger.hasHandlers():  # Избегаем дублирования обработчиков
+#         logger.setLevel(logging.INFO)
+#
+#         # Логирование в файл
+#         file_handler = logging.FileHandler("test_log.log", encoding="utf-8")
+#         file_formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+#         file_handler.setFormatter(file_formatter)
+#
+#         # Логирование в консоль
+#         console_handler = logging.StreamHandler()
+#         console_formatter = logging.Formatter("%(levelname)s: %(message)s")
+#         console_handler.setFormatter(console_formatter)
+#
+#         logger.addHandler(file_handler)
+#         logger.addHandler(console_handler)
+#
+#     yield logger  # Фикстура возвращает логгер для использования в тестах и PageObject
+#
+#     # Закрываем обработчики после завершения тестов
+#     for handler in logger.handlers:
+#         handler.close()
 
 
 @pytest.fixture(scope="session")
@@ -51,6 +78,7 @@ def admin_credentials():
         "username": os.getenv("OPENCART_USERNAME"),
         "password": os.getenv("OPENCART_PASSWORD")
     }
+
 
 @pytest.fixture
 def fake_user():

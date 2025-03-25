@@ -26,6 +26,7 @@ class AdminProductsPage(AdminBasePage):
     BACK_BUTTON = (By.CSS_SELECTOR, 'a[aria-label="Back"]')
     DELETE_BUTTON = (By.CSS_SELECTOR, ".fa-regular.fa-trash-can")
     CHECKBOX = (By.CSS_SELECTOR, 'input.form-check-input[name="selected[]"]')
+    SUCCESS_ALERT = (By.XPATH, "//div[@class='alert alert-success' and contains(text(), 'Success: You have modified products!')]")
 
     def admin_products_page_open(self):
         self.click(self.CATALOG_LINK)
@@ -83,19 +84,33 @@ class AdminProductsPage(AdminBasePage):
 
 
     def delete_product(self, fake_product):
-        #self.add_new_product(fake_product)
         self.click(self.PRODUCTS_LINK)
         WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(self.FILTER_PRODUCT_NAME))
         self.send_keys(self.FILTER_PRODUCT_NAME, fake_product["product_name"])
         self.click(self.BUTTON_FILTER)
-        checkbox = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(self.CHECKBOX))
+        time.sleep(2)
+        checkbox = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable(self.CHECKBOX))
+        self.driver.find_element(*self.CHECKBOX)
         self.driver.execute_script("arguments[0].checked = true;", checkbox)
         self.click(self.DELETE_BUTTON)
         alert = WebDriverWait(self.driver, 10).until(EC.alert_is_present())
         alert.accept()
+        #WebDriverWait(self.driver, 5).until(EC.presence_of_element_located(self.SUCCESS_ALERT))
         # WebDriverWait(self.driver, 10).until(
         #     EC.invisibility_of_element_located(self.CHECKBOX)
         # )
+
+    def is_product_deleted(self, fake_product):
+        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(self.FILTER_PRODUCT_NAME))
+        self.send_keys(self.FILTER_PRODUCT_NAME, fake_product["product_name"])
+        self.click(self.BUTTON_FILTER)
+        try:
+            WebDriverWait(self.driver, 10).until(
+                EC.text_to_be_present_in_element(self.PRODUCT_LIST, "No results!")
+            )
+            return True
+        except TimeoutException:
+            return False
 
 
 
