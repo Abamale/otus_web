@@ -3,3 +3,6 @@ selenium==4.27.1
 
 python-dotenv~=1.0.1
 Faker~=36.2.2
+
+allure-pytest==2.13.5
+allure-python-commons

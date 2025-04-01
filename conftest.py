@@ -2,7 +2,8 @@ import pytest
 from selenium import webdriver
 from dotenv import load_dotenv
 import os
-import logging
+from utils.logger import logger
+import allure
 
 from pages.admin_products_page import AdminProductsPage
 from utils.data_generator import DataGenerator
@@ -11,37 +12,12 @@ from pages.product_cart_page import ProductCartPage
 from pages.admin_login_page import AdminLoginPage
 
 
+
 def pytest_addoption(parser):
     load_dotenv()
     local_ip = os.getenv("LOCAL_IP")
     parser.addoption("--browser", action="store", default="chrome", help="Browser to use: chrome, firefox, edge")
     parser.addoption("--base-url", action="store", default=f"http://{local_ip}:8081", help="Base URL for OpenCart")
-
-# @pytest.fixture(scope="session", autouse=True)
-# def setup_logging():
-#     """Настройка логирования для тестов"""
-#     logger = logging.getLogger("TestLogger")
-#     if not logger.hasHandlers():  # Избегаем дублирования обработчиков
-#         logger.setLevel(logging.INFO)
-#
-#         # Логирование в файл
-#         file_handler = logging.FileHandler("test_log.log", encoding="utf-8")
-#         file_formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-#         file_handler.setFormatter(file_formatter)
-#
-#         # Логирование в консоль
-#         console_handler = logging.StreamHandler()
-#         console_formatter = logging.Formatter("%(levelname)s: %(message)s")
-#         console_handler.setFormatter(console_formatter)
-#
-#         logger.addHandler(file_handler)
-#         logger.addHandler(console_handler)
-#
-#     yield logger  # Фикстура возвращает логгер для использования в тестах и PageObject
-#
-#     # Закрываем обработчики после завершения тестов
-#     for handler in logger.handlers:
-#         handler.close()
 
 
 @pytest.fixture(scope="session")
@@ -51,6 +27,7 @@ def base_url(request):
 @pytest.fixture(scope="function")
 def browser(request):
     browser_type = request.config.getoption("--browser")
+    logger.info(f"Запуск браузера: {browser_type}")
 
     if browser_type == "chrome":
         driver = webdriver.Chrome()
@@ -64,6 +41,7 @@ def browser(request):
     driver.maximize_window()
     yield driver
     driver.quit()
+    logger.info(f"Браузер {browser_type} закрыт.")
 
 @pytest.fixture(scope="function")
 def page(browser, base_url):
@@ -105,6 +83,7 @@ def admin_login_page(browser, base_url):
 
 @pytest.fixture
 def admin_browser(browser, base_url, admin_credentials):
+    logger.info("Вход в админ-панель.")
     admin_login_page = AdminLoginPage(browser)
     admin_login_page.admin_page_open(base_url)
     admin_login_page.login(admin_credentials["username"], admin_credentials["password"])
@@ -120,3 +99,22 @@ def product_page(admin_browser):
 def fake_product():
     generator = DataGenerator()
     return generator.generate_products_data()
+
+
+@pytest.hookimpl(tryfirst=True, hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    outcome = yield
+    rep = outcome.get_result()
+
+    # Добавляем статус теста в item
+    item.status = 'failed' if rep.outcome != 'passed' else 'passed'
+
+    # Если тест упал, делаем скриншот
+    if rep.failed:
+        driver = item.funcargs.get("browser")  # Достаем браузер из фикстур
+        if driver:
+            screenshot = driver.get_screenshot_as_png()
+            allure.attach(screenshot, name="Ошибка", attachment_type=allure.attachment_type.PNG)
+
+        test_name = item.name
+        logger.error(f"Тест {test_name} провален! Скриншот сохранен в Allure-отчете.")

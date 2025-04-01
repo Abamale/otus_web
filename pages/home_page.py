@@ -2,6 +2,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from pages.base_page import BasePage
+import allure
 
 class HomePage(BasePage):
     SEARCH_FIELD = (By.NAME, "search")
@@ -12,12 +13,17 @@ class HomePage(BasePage):
     ALERT_CLOSE_BUTTON = (By.XPATH, "//div[contains(@class, 'alert-dismissible')]//button[@class='btn-close']")
 
 
+    @allure.step("Ищем товар с запросом: {query}")
     def search_product(self, query):
+        self.logger.info(f"Ищем продукт с запросом: {query}")
         self.send_keys(self.SEARCH_FIELD, query)
 
+    @allure.step("Добавляем товар в корзину")
     def click_add_to_cart_button(self, locator):
+        self.logger.info(f"Нажимаем кнопку 'Добавить в корзину' для первого товара")
         element = self.find(locator)
         self.driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", element)
         self.click(locator)
+        self.logger.info(f"Продукт добавлен в корзину: {locator}")
 
 
