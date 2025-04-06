@@ -1,6 +1,3 @@
-import os
-
-import pytest
 from utils.logger import logger
 import allure
 
@@ -24,4 +21,3 @@ def test_admin_logout(admin_login_page, admin_credentials):
     admin_login_page.logout()
     assert admin_login_page.is_logged_out()
     logger.info("Выход из админ-панели успешно выполнен.")
-

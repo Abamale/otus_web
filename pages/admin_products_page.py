@@ -108,10 +108,7 @@ class AdminProductsPage(AdminBasePage):
         self.click(self.DELETE_BUTTON)
         alert = WebDriverWait(self.driver, 10).until(EC.alert_is_present())
         alert.accept()
-        #WebDriverWait(self.driver, 5).until(EC.presence_of_element_located(self.SUCCESS_ALERT))
-        # WebDriverWait(self.driver, 10).until(
-        #     EC.invisibility_of_element_located(self.CHECKBOX)
-        # )
+
 
     @allure.step("Проверяем, удален ли товар")
     def is_product_deleted(self, fake_product):
@@ -126,6 +123,3 @@ class AdminProductsPage(AdminBasePage):
             return True
         except TimeoutException:
             return False
-
-
-

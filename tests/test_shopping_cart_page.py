@@ -12,4 +12,3 @@ def test_is_shopping_cart_present(browser, base_url):
     page.open(base_url)
     page.shopping_cart_open()
     assert page.is_shopping_cart_present(page.CONTENT), "Shopping cart content not found!"
-

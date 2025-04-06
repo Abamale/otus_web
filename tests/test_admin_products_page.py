@@ -1,4 +1,3 @@
-from pages.admin_products_page import AdminProductsPage
 from utils.logger import logger
 import allure
 

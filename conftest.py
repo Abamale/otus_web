@@ -10,6 +10,7 @@ from utils.data_generator import DataGenerator
 from pages.catalog_page import CatalogPage
 from pages.product_cart_page import ProductCartPage
 from pages.admin_login_page import AdminLoginPage
+from pages.home_page import HomePage
 
 
 
@@ -94,6 +95,12 @@ def product_page(admin_browser):
     products_page = AdminProductsPage(admin_browser)
     products_page.admin_products_page_open()
     return products_page
+
+@pytest.fixture
+def home_page(browser, base_url):
+    home_page = HomePage(browser)
+    home_page.open(base_url)
+    return home_page
 
 @pytest.fixture
 def fake_product():

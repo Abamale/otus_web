@@ -1,5 +1,3 @@
-from conftest import catalog_page
-from pages.product_cart_page import ProductCartPage
 from utils.logger import logger
 import allure
 

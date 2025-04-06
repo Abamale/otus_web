@@ -1,5 +1,3 @@
-from pages.catalog_page import CatalogPage
-from pages.home_page import HomePage
 from utils.logger import logger
 import allure
 
@@ -86,4 +84,3 @@ def test_changing_currency_usd_catalog(catalog_page):
     price_text = catalog_page.get_text(catalog_page.CURRENCY_PRODUCT_CARD)  # Получаем текст цены
     logger.info(f"Полученный текст цены: {price_text}")
     assert "$" in price_text, f"Currency symbol not found in: {price_text}"
-
