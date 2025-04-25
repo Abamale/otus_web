@@ -2,6 +2,13 @@ import pytest
 from selenium import webdriver
 from dotenv import load_dotenv
 import os
+import uuid
+
+from selenium.webdriver import DesiredCapabilities
+from selenium.webdriver.chrome.options import Options as ChromeOptions
+from selenium.webdriver.firefox.options import Options as FirefoxOptions
+from selenium.webdriver.edge.options import Options as EdgeOptions
+
 from utils.logger import logger
 import allure
 
@@ -19,6 +26,7 @@ def pytest_addoption(parser):
     local_ip = os.getenv("LOCAL_IP")
     parser.addoption("--browser", action="store", default="chrome", help="Browser to use: chrome, firefox, edge")
     parser.addoption("--base-url", action="store", default=f"http://{local_ip}:8081", help="Base URL for OpenCart")
+    parser.addoption("--remote", action="store_true", help="Use remote browser via Selenoid")
 
 
 @pytest.fixture(scope="session")
@@ -27,17 +35,57 @@ def base_url(request):
 
 @pytest.fixture(scope="function")
 def browser(request):
+    load_dotenv()
+    local_ip = os.getenv("LOCAL_IP")
+
     browser_type = request.config.getoption("--browser")
+    use_remote = request.config.getoption("--remote")
     logger.info(f"Запуск браузера: {browser_type}")
 
-    if browser_type == "chrome":
-        driver = webdriver.Chrome()
-    elif browser_type == "firefox":
-        driver = webdriver.Firefox()
-    elif browser_type == "edge":
-        driver = webdriver.Edge()
+    if use_remote:
+        selenoid_url = f"http://{local_ip}:4444/wd/hub"
+
+        # Устанавливаем нужные опции в зависимости от браузера
+        if browser_type == "chrome":
+            options = ChromeOptions()
+            options.add_argument("--headless")  # Запуск в headless-режиме
+            options.add_experimental_option("w3c", True)  # Поддержка W3C
+            options.set_capability("enableVNC", True)
+            options.set_capability("enableVideo", True)  # Включить видео
+            options.set_capability("videoName", f"{uuid.uuid4()}.mp4")  # Уникальное имя для видео
+
+
+        elif browser_type == "firefox":
+            options = FirefoxOptions()
+            options.headless = True  # Включение headless-режима
+            options.set_capability("enableVNC", True)
+            options.set_capability("enableVideo", True)  # Включить видео
+            options.set_capability("videoName", f"{uuid.uuid4()}.mp4")
+
+
+        elif browser_type == "edge":
+            options = EdgeOptions()
+            options.add_argument("--headless")  # Запуск в headless-режиме
+            options.set_capability("enableVNC", True)
+            options.set_capability("enableVideo", True)  # Включить видео
+            options.set_capability("videoName", f"{uuid.uuid4()}.mp4")
+
+        else:
+            raise ValueError(f"Unsupported browser: {browser_type}")
+
+            # Создаём драйвер с учётом опций
+        driver = webdriver.Remote(command_executor=selenoid_url, options=options)
+
     else:
-        raise ValueError(f"Unsupported browser: {browser_type}")
+        # Локальный запуск браузера, без Selenoid
+        if browser_type == "chrome":
+            driver = webdriver.Chrome()
+        elif browser_type == "firefox":
+            driver = webdriver.Firefox()
+        elif browser_type == "edge":
+            driver = webdriver.Edge()
+        else:
+            raise ValueError(f"Unsupported browser: {browser_type}")
 
     driver.maximize_window()
     yield driver
