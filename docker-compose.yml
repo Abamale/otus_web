@@ -39,35 +39,35 @@ services:
     networks:
       - selenoid-network
 
-  selenoid:
-    image: aerokube/selenoid:latest
-    container_name: selenoid
-    ports:
-      - '${SELENOID_PORT}:4444'
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./selenoid:/etc/selenoid:ro
-      - ./selenoid/video:/opt/selenoid/video
-    command: [
-      "-limit", "5",
-      "-conf", "/etc/selenoid/browsers.json",
-      "-video-output-dir", "/opt/selenoid/video",
-      "-container-network", "selenoid-network"
-    ]
-    networks:
-      - selenoid-network
-
-  selenoid-ui:
-    image: aerokube/selenoid-ui:latest
-    container_name: selenoid-ui
-    ports:
-      - '${SELENOID_UI_PORT}:8080'
-    depends_on:
-      - selenoid
-    environment:
-      - SELENOID_URI=http://selenoid:${SELENOID_PORT}
-    networks:
-      - selenoid-network
+#  selenoid:
+#    image: aerokube/selenoid:latest
+#    container_name: selenoid
+#    ports:
+#      - '${SELENOID_PORT}:4444'
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock
+#      - ./selenoid:/etc/selenoid:ro
+#      - ./selenoid/video:/opt/selenoid/video
+#    command: [
+#      "-limit", "5",
+#      "-conf", "/etc/selenoid/browsers.json",
+#      "-video-output-dir", "/opt/selenoid/video",
+#      "-container-network", "selenoid-network"
+#    ]
+#    networks:
+#      - selenoid-network
+#
+#  selenoid-ui:
+#    image: aerokube/selenoid-ui:latest
+#    container_name: selenoid-ui
+#    ports:
+#      - '${SELENOID_UI_PORT}:8080'
+#    depends_on:
+#      - selenoid
+#    environment:
+#      - SELENOID_URI=http://selenoid:${SELENOID_PORT}
+#    networks:
+#      - selenoid-network
 
 
 networks:
