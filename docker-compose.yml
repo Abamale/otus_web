@@ -8,8 +8,6 @@ services:
       - PMA_USER=bn_opencart
     ports:
       - '${PHPADMIN_PORT}:80'
-    networks:
-      - selenoid-network
 
   mariadb:
     image: docker.io/bitnami/mariadb:11.2
@@ -19,8 +17,6 @@ services:
       - MARIADB_DATABASE=bitnami_opencart
     ports:
       - '3306:3306'
-    networks:
-      - selenoid-network
 
   opencart:
     image: bitnami/opencart:4.0.2-3-debian-12-r33
@@ -36,40 +32,4 @@ services:
       - ALLOW_EMPTY_PASSWORD=yes
     depends_on:
       - mariadb
-    networks:
-      - selenoid-network
 
-#  selenoid:
-#    image: aerokube/selenoid:latest
-#    container_name: selenoid
-#    ports:
-#      - '${SELENOID_PORT}:4444'
-#    volumes:
-#      - /var/run/docker.sock:/var/run/docker.sock
-#      - ./selenoid:/etc/selenoid:ro
-#      - ./selenoid/video:/opt/selenoid/video
-#    command: [
-#      "-limit", "5",
-#      "-conf", "/etc/selenoid/browsers.json",
-#      "-video-output-dir", "/opt/selenoid/video",
-#      "-container-network", "selenoid-network"
-#    ]
-#    networks:
-#      - selenoid-network
-#
-#  selenoid-ui:
-#    image: aerokube/selenoid-ui:latest
-#    container_name: selenoid-ui
-#    ports:
-#      - '${SELENOID_UI_PORT}:8080'
-#    depends_on:
-#      - selenoid
-#    environment:
-#      - SELENOID_URI=http://selenoid:${SELENOID_PORT}
-#    networks:
-#      - selenoid-network
-
-
-networks:
-  selenoid-network:
-    driver: bridge
