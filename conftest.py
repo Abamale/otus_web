@@ -2,6 +2,13 @@ import pytest
 from selenium import webdriver
 from dotenv import load_dotenv
 import os
+import uuid
+
+from selenium.webdriver import DesiredCapabilities
+from selenium.webdriver.chrome.options import Options as ChromeOptions
+from selenium.webdriver.firefox.options import Options as FirefoxOptions
+from selenium.webdriver.edge.options import Options as EdgeOptions
+
 from utils.logger import logger
 import allure
 
@@ -19,6 +26,8 @@ def pytest_addoption(parser):
     local_ip = os.getenv("LOCAL_IP")
     parser.addoption("--browser", action="store", default="chrome", help="Browser to use: chrome, firefox, edge")
     parser.addoption("--base-url", action="store", default=f"http://{local_ip}:8081", help="Base URL for OpenCart")
+    parser.addoption("--remote", action="store_true", help="Use remote browser via Selenoid")
+    parser.addoption("--executor", action="store", default=f"{local_ip}")
 
 
 @pytest.fixture(scope="session")
@@ -27,17 +36,52 @@ def base_url(request):
 
 @pytest.fixture(scope="function")
 def browser(request):
-    browser_type = request.config.getoption("--browser")
+    load_dotenv()
+    #local_ip = os.getenv("LOCAL_IP")
+
+    browser_type = request.config.getoption("--browser").lower()
+    use_remote = request.config.getoption("--remote")
+    executor = request.config.getoption("--executor")
     logger.info(f"Запуск браузера: {browser_type}")
 
-    if browser_type == "chrome":
-        driver = webdriver.Chrome()
-    elif browser_type == "firefox":
-        driver = webdriver.Firefox()
-    elif browser_type == "edge":
-        driver = webdriver.Edge()
+    if use_remote:
+        # selenoid_url = f"http://{local_ip}:4444/wd/hub"
+        session_id = str(uuid.uuid4())
+        executor = request.config.getoption("--executor")
+
+        if browser_type == "chrome":
+            options = ChromeOptions()
+        elif browser_type == "firefox":
+            options = FirefoxOptions()
+        elif browser_type == "edge":
+            options = EdgeOptions()
+        else:
+            raise ValueError(f"Unsupported browser: {browser_type}")
+
+        options.set_capability("browserName", browser_type)
+        options.set_capability("browserVersion", "128.0")  # или убери, если динамический выбор
+        options.set_capability("selenoid:options", {
+            "enableVNC": True,
+            "enableVideo": True,
+            "videoName": f"{session_id}.mp4",
+            "screenResolution": "1920x1080x24"
+        })
+
+        driver = webdriver.Remote(
+            command_executor=f"http://{executor}:4444/wd/hub",
+            options=options
+        )
+
     else:
-        raise ValueError(f"Unsupported browser: {browser_type}")
+        # Локальный запуск браузера, без Selenoid
+        if browser_type == "chrome":
+            driver = webdriver.Chrome()
+        elif browser_type == "firefox":
+            driver = webdriver.Firefox()
+        elif browser_type == "edge":
+            driver = webdriver.Edge()
+        else:
+            raise ValueError(f"Unsupported browser: {browser_type}")
 
     driver.maximize_window()
     yield driver

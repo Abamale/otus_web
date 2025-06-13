@@ -32,3 +32,4 @@ services:
       - ALLOW_EMPTY_PASSWORD=yes
     depends_on:
       - mariadb
+
