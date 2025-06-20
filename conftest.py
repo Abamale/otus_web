@@ -19,6 +19,9 @@ from pages.product_cart_page import ProductCartPage
 from pages.admin_login_page import AdminLoginPage
 from pages.home_page import HomePage
 
+load_dotenv()
+from utils.api_client import APIClient
+
 
 
 def pytest_addoption(parser):
@@ -169,3 +172,8 @@ def pytest_runtest_makereport(item, call):
 
         test_name = item.name
         logger.error(f"Тест {test_name} провален! Скриншот сохранен в Allure-отчете.")
+
+
+@pytest.fixture(scope="session")
+def api_client():
+    return APIClient()

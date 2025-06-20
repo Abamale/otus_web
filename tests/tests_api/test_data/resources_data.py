@@ -1,0 +1,5 @@
+import pytest
+
+
+EXISTING_RESOURCE_IDS = [1, 2, 3]
+NOT_FOUND_RESOURCE_IDS = [23, 0, -1]
