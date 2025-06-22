@@ -33,3 +33,13 @@ services:
     depends_on:
       - mariadb
 
+  jenkins:
+    image: jenkins/jenkins:lts
+    container_name: jenkins
+    ports:
+      - "8085:8080"   # Локально 8085 -> внутри контейнера 8080
+    volumes:
+      - jenkins_home:/var/jenkins_home
+
+volumes:
+  jenkins_home:

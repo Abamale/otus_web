@@ -91,6 +91,29 @@ def browser(request):
     driver.quit()
     logger.info(f"Браузер {browser_type} закрыт.")
 
+
+
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    outcome = yield
+    rep = outcome.get_result()
+
+    if rep.when == "call" and rep.failed:
+        driver = item.funcargs.get("driver")  # или "browser"
+        if driver:
+            try:
+                os.makedirs("screenshots", exist_ok=True)
+                screenshot_name = f"screenshots/{item.name}.png"
+                driver.save_screenshot(screenshot_name)
+                allure.attach.file(
+                    screenshot_name,
+                    name="screenshot",
+                    attachment_type=allure.attachment_type.PNG
+                )
+            except Exception as e:
+                print(f"⚠️ Failed to attach screenshot: {e}")
+
+
 @pytest.fixture(scope="function")
 def page(browser, base_url):
     browser.get(base_url)
