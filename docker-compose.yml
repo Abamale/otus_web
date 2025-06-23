@@ -43,6 +43,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock  # <== доступ к сокету хоста
       - /usr/bin/docker:/usr/bin/docker            # <== бинарник docker хоста
       - /usr/local/bin/docker-compose:/usr/local/bin/docker-compose # <== бинарник docker-compose (если используешь старый compose v1)
+    user: root  # <--- важно! иначе Jenkins не сможет запускать docker внутри контейнера
 
 volumes:
   jenkins_home:
