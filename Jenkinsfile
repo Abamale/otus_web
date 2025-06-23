@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        // Читаем .env однажды и делаем переменные доступными в скриптах
-        ENV_VARS = sh(script: "cat .env | xargs", returnStdout: true).trim()
+        // Читаем .env надёжно (без комментариев)
+        ENV_VARS = sh(script: 'grep -v "^#" .env | xargs', returnStdout: true).trim()
     }
 
     stages {
@@ -17,6 +17,7 @@ pipeline {
             steps {
                 echo "Starting docker-compose services..."
                 sh '''
+                set -e
                 export ${ENV_VARS}
                 docker compose up -d
                 '''
@@ -26,7 +27,11 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 echo "Installing Python requirements..."
-                sh 'pip install -r requirements.txt'
+                sh '''
+                set -e
+                export ${ENV_VARS}
+                python3 -m pip install -r requirements.txt
+                '''
             }
         }
 
@@ -34,6 +39,7 @@ pipeline {
             steps {
                 echo "Running API tests..."
                 sh '''
+                set -e
                 export ${ENV_VARS}
                 pytest tests/tests_api/ --alluredir=allure-results/api
                 '''
@@ -44,6 +50,7 @@ pipeline {
             steps {
                 echo "Running UI tests..."
                 sh '''
+                set -e
                 export ${ENV_VARS}
                 pytest tests/ --ignore=tests/tests_api --alluredir=allure-results/ui
                 '''
@@ -69,10 +76,12 @@ pipeline {
         always {
             echo "Cleaning up..."
             sh '''
+            set +e
             export ${ENV_VARS}
-            docker-compose down
+            docker compose down || true
             '''
             archiveArtifacts artifacts: '**/allure-results/**/*.*', allowEmptyArchive: true
         }
     }
 }
+
