@@ -40,6 +40,9 @@ services:
       - "8085:8080"   # Локально 8085 -> внутри контейнера 8080
     volumes:
       - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock  # <== доступ к сокету хоста
+      - /usr/bin/docker:/usr/bin/docker            # <== бинарник docker хоста
+      - /usr/local/bin/docker-compose:/usr/local/bin/docker-compose # <== бинарник docker-compose (если используешь старый compose v1)
 
 volumes:
   jenkins_home:

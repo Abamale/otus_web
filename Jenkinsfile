@@ -18,7 +18,7 @@ pipeline {
                 echo "Starting docker-compose services..."
                 sh '''
                 export ${ENV_VARS}
-                docker-compose up -d
+                docker compose up -d
                 '''
             }
         }
