@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
+        // Если .env нужен — оставляем
         ENV_VARS = sh(script: 'grep -v "^#" .env | xargs', returnStdout: true).trim()
-        DOCKER_BIN = '/usr/bin/docker'  // <-- поменяйте путь, если докер в другом месте
     }
 
     stages {
@@ -19,12 +19,8 @@ pipeline {
                 sh '''
                 set -e
                 export ${ENV_VARS}
-                echo "PATH = $PATH"
-                which docker
-                docker --version
-                docker compose version || echo "docker compose command not found"
-                ${DOCKER_BIN} compose down || true
-                ${DOCKER_BIN} compose up -d
+                docker compose down || true
+                docker compose up -d
                 '''
             }
         }
@@ -83,9 +79,10 @@ pipeline {
             sh '''
             set +e
             export ${ENV_VARS}
-            ${DOCKER_BIN} compose down || true
+            docker compose down || true
             '''
             archiveArtifacts artifacts: '**/allure-results/**/*.*', allowEmptyArchive: true
         }
     }
 }
+
