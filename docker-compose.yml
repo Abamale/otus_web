@@ -36,14 +36,16 @@ services:
   jenkins:
     image: jenkins/jenkins:lts
     container_name: jenkins
+    user: root
     ports:
       - "8085:8080"   # Локально 8085 -> внутри контейнера 8080
     volumes:
       - jenkins_home:/var/jenkins_home
-      - /var/run/docker.sock:/var/run/docker.sock  # <== доступ к сокету хоста
-      - /usr/bin/docker:/usr/bin/docker            # <== бинарник docker хоста
-      - /usr/local/bin/docker-compose:/usr/local/bin/docker-compose # <== бинарник docker-compose (если используешь старый compose v1)
-    user: root  # <--- важно! иначе Jenkins не сможет запускать docker внутри контейнера
+      - /var/run/docker.sock:/var/run/docker.sock  # ✅ Хостовый docker.sock
+      - /usr/bin/docker:/usr/bin/docker            # ✅ Хостовый бинарник docker
+      - /usr/local/bin/docker-compose:/usr/local/bin/docker-compose # ✅ Хостовый binary docker-compose (v1)
+    environment:
+      - DOCKER_HOST=unix:///var/run/docker.sock  # ✅ Рекомендуется явно
 
 volumes:
   jenkins_home:
