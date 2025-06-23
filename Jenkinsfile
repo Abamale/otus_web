@@ -23,6 +23,7 @@ pipeline {
                 which docker
                 docker --version
                 docker compose version || echo "docker compose command not found"
+                ${DOCKER_BIN} compose down || true
                 ${DOCKER_BIN} compose up -d
                 '''
             }
