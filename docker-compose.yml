@@ -34,17 +34,16 @@ services:
       - mariadb
 
   jenkins:
-    image: jenkins/jenkins:lts
+    build: .              # Строим из твоего Dockerfile (не используем image: jenkins/jenkins:lts напрямую)
     container_name: jenkins
-    user: root
+    user: root            # Нужно, чтобы внутри можно было управлять Docker
     ports:
-      - "8085:8080"   # Локально 8085 -> внутри контейнера 8080
+        - "8085:8080"       # Локально 8085 → внутри Jenkins 8080
     volumes:
-      - jenkins_home:/var/jenkins_home
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /usr/bin/docker:/usr/bin/docker
+      - jenkins_home:/var/jenkins_home   # Постоянное хранилище Jenkins
+      - /var/run/docker.sock:/var/run/docker.sock  # Делимся сокетом хост-докера
     environment:
-      - DOCKER_HOST=unix:///var/run/docker.sock  # ✅ Рекомендуется явно
+      - DOCKER_HOST=unix:///var/run/docker.sock  # Рекомендуется явно
 
 volumes:
   jenkins_home:
