@@ -15,11 +15,11 @@ pipeline {
 
         stage('Start Containers') {
             steps {
-                echo "Starting docker-compose services..."
+                echo "Starting docker compose services..."
                 sh '''
                 set -e
                 export ${ENV_VARS}
-                docker-compose up -d
+                docker compose up -d
                 '''
             }
         }
@@ -78,7 +78,7 @@ pipeline {
             sh '''
             set +e
             export ${ENV_VARS}
-            docker-compose down || true
+            docker compose down || true
             '''
             archiveArtifacts artifacts: '**/allure-results/**/*.*', allowEmptyArchive: true
         }
