@@ -45,7 +45,11 @@ def browser(request):
     logger.info(f"Запуск браузера: {browser_type}")
 
     if browser_type == "chrome":
-        driver = webdriver.Chrome()
+        options = webdriver.ChromeOptions()
+        options.add_argument("--headless=new")
+        options.add_argument("--no-sandbox")
+        options.add_argument("--disable-dev-shm-usage")
+        driver = webdriver.Chrome(options=options)
     elif browser_type == "firefox":
         driver = webdriver.Firefox()
     elif browser_type == "edge":
