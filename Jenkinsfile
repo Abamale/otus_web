@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         ENV_VARS = sh(script: 'grep -v "^#" .env | xargs', returnStdout: true).trim()
+        CHROME_BIN = '/usr/bin/google-chrome-stable'
     }
 
     stages {
