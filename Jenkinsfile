@@ -38,22 +38,32 @@ pipeline {
         stage('Run API Tests') {
             steps {
                 echo "Running API tests..."
-                sh '''
-                    set -e
-                    export ${ENV_VARS}
-                    pytest tests/tests_api/ --alluredir=allure-results/api
-                '''
+                script {
+                    apiStatus = sh(
+                        script: '''
+                            set -e
+                            export ${ENV_VARS}
+                            pytest tests/tests_api/ --alluredir=allure-results/api
+                        ''',
+                        returnStatus: true
+                    )
+                }
             }
         }
 
         stage('Run UI Tests') {
             steps {
                 echo "Running UI tests..."
-                sh '''
-                    set -e
-                    export ${ENV_VARS}
-                    pytest tests/ --ignore=tests/tests_api --alluredir=allure-results/ui
-                '''
+                script {
+                    uiStatus = sh(
+                        script: '''
+                            set -e
+                            export ${ENV_VARS}
+                            pytest tests/ --ignore=tests/tests_api --alluredir=allure-results/ui
+                        ''',
+                        returnStatus: true
+                    )
+                }
             }
         }
     }
@@ -80,6 +90,12 @@ pipeline {
                     [path: 'allure-results/ui']
                 ]
             ])
+
+            script {
+                if (apiStatus != 0 || uiStatus != 0) {
+                    currentBuild.result = 'UNSTABLE'
+                }
+            }
         }
     }
 }
