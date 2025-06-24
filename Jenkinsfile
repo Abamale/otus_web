@@ -72,6 +72,7 @@ pipeline {
 
             echo "Publishing Allure report..."
             allure([
+                commandline: 'Allure Commandline', // вот ЭТО строка новая!
                 includeProperties: false,
                 jdk: '',
                 results: [
