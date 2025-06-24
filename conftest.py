@@ -49,6 +49,14 @@ def browser(request):
         options.add_argument("--headless=new")
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-dev-shm-usage")
+        options.add_argument("--disable-gpu")  # Важно для headless
+        options.add_argument("--remote-debugging-port=9222")  # Для отладки
+        options.add_argument("--disable-software-rasterizer")  # Отключает GPU-рендеринг
+        options.add_argument("--disable-extensions")  # Отключает расширения
+        options.add_argument("--disable-setuid-sandbox")  # Дополнительная защита
+
+        # Укажите явный путь к Chrome, если нужно
+        options.binary_location = "/usr/bin/google-chrome-stable"
         driver = webdriver.Chrome(options=options)
     elif browser_type == "firefox":
         driver = webdriver.Firefox()
