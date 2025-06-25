@@ -27,11 +27,14 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                echo "Installing Python requirements..."
+                echo "Creating virtual environment and installing Python requirements..."
                 sh '''
                     set -e
                     export ${ENV_VARS}
-                    python3 -m pip install -r requirements.txt
+                    python3 -m venv venv
+                    . venv/bin/activate
+                    pip install --upgrade pip
+                    pip install -r requirements.txt
                 '''
             }
         }
@@ -44,6 +47,7 @@ pipeline {
                         script: '''
                             set -e
                             export ${ENV_VARS}
+                            . venv/bin/activate
                             pytest tests/tests_api/ --alluredir=allure-results/api
                         ''',
                         returnStatus: true
@@ -60,6 +64,7 @@ pipeline {
                         script: '''
                             set -e
                             export ${ENV_VARS}
+                            . venv/bin/activate
                             pytest tests/ --ignore=tests/tests_api --alluredir=allure-results/ui
                         ''',
                         returnStatus: true
@@ -83,7 +88,7 @@ pipeline {
 
             echo "Publishing Allure report..."
             allure([
-                commandline: 'Allure Commandline', // вот ЭТО строка новая!
+                commandline: 'Allure Commandline',
                 includeProperties: false,
                 jdk: '',
                 results: [
