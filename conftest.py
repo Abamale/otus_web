@@ -56,7 +56,7 @@ def browser(request):
         options.add_argument("--disable-setuid-sandbox")  # Дополнительная защита
 
         # Укажите явный путь к Chrome, если нужно
-        options.binary_location = "/usr/bin/google-chrome-stable"
+        # options.binary_location = "/usr/bin/google-chrome-stable"
         driver = webdriver.Chrome(options=options)
     elif browser_type == "firefox":
         driver = webdriver.Firefox()
