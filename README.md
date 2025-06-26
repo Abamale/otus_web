@@ -1,49 +1,100 @@
-# otus_web
+# OTUS Capstone Project
 
-Тесты запускаются командой: 
-- определенный набор тестов:
-pytest tests/test_admin_products_page.py --alluredir=reports/allure-results
+## Тема
 
-- все тесты:
-pytest tests/ --alluredir=reports/allure-results
+**Development of Automated API and UI Tests with Selenium, Pytest, and Allure Reporting for Remote Execution**
 
-Отчет allure формируется: allure serve reports/allure-results
+---
 
-"Поломанный" тест со скриншотом: test_admin_product_page/test_fail_wrong_locator
+## Описание
 
+В данном репозитории представлены автоматизированные тесты, разработанные в рамках итогового проекта на курсе OTUS.
 
-Запуск тестов удаленно на selenoid:
-Компонент	URL для доступа:
-OpenCart	http://${LOCAL_IP}:8081
-phpMyAdmin	http://${LOCAL_IP}:8888
-Selenoid UI	http://${LOCAL_IP}:8080
-Selenoid API	http://${LOCAL_IP}:4444/status
+### Реализованные тесты:
 
-Скачать Configuration Manager:
-https://aerokube.com/cm/latest/ 
+1. **API-тест** для сервиса [reqres.in/api](https://reqres.in)
+2. **UI-тесты** для платформы [OpenCart](https://demo.opencart.com)
 
-команда для запуска:
-./cm_linux_amd64 selenoid start
-./cm_linux_amd64 selenoid-ui start
+Результаты выполнения тестов оформлены в виде **Allure-отчёта**.  
+Сборка и запуск тестов осуществляется через **Jenkins**, работающий в Docker-контейнере.
 
-команда для остановки:
-./cm_linux_amd64 selenoid stop
-./cm_linux_amd64 selenoid-ui stop
+---
 
-посмотреть запущенные контейнеры:
-docker ps 
+## Используемые технологии
 
-удалить образы и настройки:
-selenoid cleanup
+- **Selenium** – автоматизация UI-тестов  
+- **Pytest** – основной фреймворк для тестирования  
+- **Allure** – генерация отчётов о запуске тестов  
+- **Requests** – выполнение API-запросов  
+- **Faker** – генерация тестовых данных  
+- **Pydantic** – валидация JSON-схем  
+- **Logger** – логирование  
+- **Jenkins** – CI/CD и удалённый запуск  
+- **Docker** – контейнеризация и локальный запуск сервисов
 
-скачать образы браузеров:
-docker pull quay.io/browser/google-chrome-stable:133.0
+---
 
-установить количество сессий:
-./cm_linux_amd64 selenoid start --args "-limit=10"
+## Структура проекта
 
-для запуска контейнера с opencart:
-docker compose up -d
+```
+.
+├── tests/
+│   ├── test_api/               # API-тесты
+│   └── test_ui/                # UI-тесты
+├── utils/
+│   ├── data_generator.py       # Генерация данных через Faker
+│   └── schemas/                # Pydantic-схемы для API-валидации
+├── docker-compose.yml          # Запуск OpenCart
+├── Dockerfile                  # Сборка Jenkins
+└── reports/
+    └── allure-results/         # Результаты тестов для Allure
+```
 
-запуск тестов:
-pytest tests/test_admin_login.py --browser=chrome --remote --alluredir=allure-results
+---
+
+## Детали запуска
+
+### Jenkins
+
+- Jenkins собирается из `Dockerfile`
+- Доступен по порту **8085**
+
+Запуск Jenkins:
+```bash
+docker build -t jenkins-capstone -f Dockerfile .
+docker run -p 8085:8080 jenkins-capstone
+```
+
+### OpenCart
+
+- Запускается через `docker-compose.yml`
+- Доступен по адресу: [http://localhost:8081](http://localhost:8081)
+
+Команда запуска:
+```bash
+docker-compose up -d
+```
+
+---
+
+## Allure-отчёт
+
+После выполнения тестов для просмотра отчёта используйте команду:
+```bash
+allure serve reports/allure-results
+```
+
+Откроется локальный сервер с визуализацией результатов в браузере.
+
+---
+
+## Дополнительно
+
+- **Валидация JSON-ответов** реализована с помощью **Pydantic-моделей**, расположенных в `utils/schemas/`
+- **Генерация тестовых данных** для UI-тестов выполняется через библиотеку **Faker**, см. `utils/data_generator.py`
+
+---
+
+## Автор Марина Абакумова
+
+Итоговый проект по курсу «Python QA Engineer» на платформе OTUS  
